@@ -1,6 +1,10 @@
 package models
 
+import "time"
+
 type Post struct {
-	Title string `json:"title" binding:"required"`
-	Body  string `json:"body" binding:"required"`
+	ID        int
+	UserID    int
+	Content   string `json:"content" binding:"required"`
+	CreatedAt time.Time
 }

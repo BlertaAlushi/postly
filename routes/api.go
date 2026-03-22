@@ -23,6 +23,9 @@ func ApiRoutes(r *gin.Engine) {
 	auth.Use(middlewares.AuthMiddleware())
 	{
 		auth.GET("/posts", post.GetPosts)
-		auth.POST("/post", post.CreatePost)
+		auth.POST("/posts", post.CreatePost)
+		auth.GET("/posts/:id", post.GetPost)
+		auth.PUT("/posts/:id", post.UpdatePost)
+		auth.DELETE("/posts/:id", post.DeletePost)
 	}
 }

@@ -34,10 +34,7 @@ func (ur UserRepository) CreateUser(register models.Register) error {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(register.Password), bcrypt.DefaultCost)
 	_, err := configs.DB.Exec("Insert into users(username,password,email,firstname,lastname) values($1,$2,$3,$4,$5)",
 		register.Username, hashedPassword, register.Email, register.Firstname, register.Lastname)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (ur UserRepository) GetUser(username string) (models.User, error) {

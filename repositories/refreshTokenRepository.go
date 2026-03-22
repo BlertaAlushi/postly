@@ -17,10 +17,7 @@ func (r RefreshTokenRepository) CreateRefreshToken(refreshToken models.RefreshTo
 	var id int
 	err := configs.DB.QueryRow("Insert into refresh_tokens(token_hash,user_id,expires_at) values($1,$2,$3) returning id",
 		refreshToken.TokenHash, refreshToken.UserID, refreshToken.ExpiresAt).Scan(&id)
-	if err != nil {
-		return id, err
-	}
-	return id, nil
+	return id, err
 }
 
 func (r RefreshTokenRepository) GetRefreshTokenById(tokenID int) (models.RefreshToken, error) {
@@ -40,8 +37,5 @@ func (r RefreshTokenRepository) GetRefreshTokenById(tokenID int) (models.Refresh
 
 func (r RefreshTokenRepository) DeleteRefreshToken(tokenHash string) error {
 	_, err := configs.DB.Exec("delete from refresh_tokens where token_hash = $1", tokenHash)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }

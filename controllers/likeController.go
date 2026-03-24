@@ -18,7 +18,7 @@ func NewLikeController() *LikeController {
 
 func (lc LikeController) NewLike(c *gin.Context) {
 	var like models.Like
-	userID, _ := c.Get("userID")
+	userID, _ := c.Get("user_id")
 	like.UserID = userID.(int)
 	postID := c.Param("id")
 	like.PostID, _ = strconv.Atoi(postID)
@@ -26,7 +26,7 @@ func (lc LikeController) NewLike(c *gin.Context) {
 	status, err := likeService.NewLike(like)
 	if err != nil {
 		c.JSON(status, gin.H{
-			"error": err,
+			"error": err.Error(),
 		})
 		return
 	}
@@ -37,7 +37,7 @@ func (lc LikeController) NewLike(c *gin.Context) {
 
 func (lc LikeController) RemoveLike(c *gin.Context) {
 	var like models.Like
-	userID, _ := c.Get("userID")
+	userID, _ := c.Get("user_id")
 	like.UserID = userID.(int)
 	postID := c.Param("id")
 	like.PostID, _ = strconv.Atoi(postID)
@@ -45,7 +45,7 @@ func (lc LikeController) RemoveLike(c *gin.Context) {
 	status, err := likeService.RemoveLike(like)
 	if err != nil {
 		c.JSON(status, gin.H{
-			"error": err,
+			"error": err.Error(),
 		})
 		return
 	}

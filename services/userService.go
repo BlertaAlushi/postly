@@ -25,7 +25,7 @@ func NewUserService() *UserService {
 func (us UserService) Register(register models.Register) (int, string, error) {
 	exist, err := userRepository.CheckUser(register.Username)
 	if err != nil {
-		return http.StatusInternalServerError, "", err
+		return http.StatusInternalServerError, "", errors.New("internal server error")
 	}
 
 	if exist {
@@ -34,7 +34,7 @@ func (us UserService) Register(register models.Register) (int, string, error) {
 
 	err = userRepository.CreateUser(register)
 	if err != nil {
-		return http.StatusInternalServerError, "", err
+		return http.StatusInternalServerError, "", errors.New("internal server error")
 	}
 
 	return http.StatusOK, "User Created", nil
@@ -47,7 +47,7 @@ func (us UserService) Login(login models.Login) (int, models.AuthToken, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return http.StatusNotFound, authToken, errors.New("user not found")
 		}
-		return http.StatusInternalServerError, authToken, err
+		return http.StatusInternalServerError, authToken, errors.New("internal server error")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(login.Password))
@@ -57,12 +57,12 @@ func (us UserService) Login(login models.Login) (int, models.AuthToken, error) {
 
 	accessToken, err := GenerateJWT(user.ID)
 	if err != nil {
-		return http.StatusInternalServerError, authToken, err
+		return http.StatusInternalServerError, authToken, errors.New("internal server error")
 	}
 
 	id, refreshToken, err := refreshTokenService.NewRefreshToken(user.ID)
 	if err != nil {
-		return http.StatusInternalServerError, authToken, err
+		return http.StatusInternalServerError, authToken, errors.New("internal server error")
 	}
 
 	authToken.AccessToken = accessToken
@@ -76,16 +76,19 @@ func (us UserService) Logout(refreshToken string) (int, error) {
 	tokenId, _ := strconv.Atoi(parts[0])
 	getRefreshToken, err := refreshTokenRepository.GetRefreshTokenById(tokenId)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return http.StatusUnauthorized, errors.New("refresh token not found")
+		}
 		return http.StatusInternalServerError, err
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(getRefreshToken.TokenHash), []byte(parts[1])); err != nil {
-		return http.StatusInternalServerError, errors.New("wrong refresh token")
+		return http.StatusUnauthorized, errors.New("wrong refresh token")
 	}
 
 	err = refreshTokenRepository.DeleteRefreshToken(getRefreshToken.TokenHash)
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, errors.New("internal server error")
 	}
 	return http.StatusOK, nil
 }

@@ -23,7 +23,7 @@ func (ps PostService) GetPosts(userID int) (int, []models.Post, error) {
 func (ps PostService) CreatePost(newPost models.Post) (int, error) {
 	err := postRepository.Store(newPost)
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, errors.New("internal server error")
 	}
 	return http.StatusOK, nil
 }
@@ -53,7 +53,7 @@ func (ps PostService) UpdatePost(post models.Post) (int, error) {
 func (ps PostService) DeletePost(postID int) (int, error) {
 	err := postRepository.Delete(postID)
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, errors.New("internal server error")
 	}
 	return http.StatusOK, nil
 }

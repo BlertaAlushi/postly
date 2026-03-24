@@ -37,28 +37,28 @@ func (rts RefreshTokenService) RefreshToken(postRefreshToken string) (int, model
 		if errors.Is(err, sql.ErrNoRows) {
 			return http.StatusNotFound, authToken, errors.New("refresh token not found")
 		}
-		return http.StatusInternalServerError, authToken, err
+		return http.StatusInternalServerError, authToken, errors.New("internal server error")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(getRefreshToken.TokenHash), []byte(parts[1]))
 	if err != nil {
-		return http.StatusUnauthorized, authToken, errors.New("wrong refresh token")
+		return http.StatusNotFound, authToken, errors.New("wrong refresh token")
 	}
 
 	userID := getRefreshToken.UserID
 	err = refreshTokenRepository.DeleteRefreshToken(getRefreshToken.TokenHash)
 	if err != nil {
-		return http.StatusInternalServerError, authToken, err
+		return http.StatusInternalServerError, authToken, errors.New("internal server error")
 	}
 
 	accessToken, err := GenerateJWT(userID)
 	if err != nil {
-		return http.StatusInternalServerError, authToken, err
+		return http.StatusInternalServerError, authToken, errors.New("internal server error")
 	}
 
 	id, newRefreshToken, err := NewRT(userID)
 	if err != nil {
-		return http.StatusInternalServerError, authToken, err
+		return http.StatusInternalServerError, authToken, errors.New("internal server error")
 	}
 
 	authToken.AccessToken = accessToken

@@ -16,6 +16,10 @@ func NewLikeController() *LikeController {
 	return new(LikeController)
 }
 
+func (lc LikeController) Likes(c *gin.Context) {
+
+}
+
 func (lc LikeController) NewLike(c *gin.Context) {
 	var like models.Like
 	userID, _ := c.Get("user_id")

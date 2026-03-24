@@ -30,11 +30,7 @@ func (pr PostRepository) Update(post models.Post) (bool, error) {
 	}
 
 	rows, err := result.RowsAffected()
-	if err != nil {
-		return false, err
-	}
-
-	return rows > 0, nil
+	return rows > 0, err
 }
 
 func (pr PostRepository) Delete(postID int) error {

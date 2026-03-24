@@ -2,9 +2,10 @@ package models
 
 import "time"
 
-type Post struct {
+type Comment struct {
 	ID        int       `json:"id"`
 	UserID    int       `json:"user_id"`
+	PostID    int       `json:"post_id"`
 	Content   string    `json:"content" binding:"required"`
 	CreatedAt time.Time `json:"created_at"`
 }

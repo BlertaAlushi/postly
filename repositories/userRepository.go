@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"database/sql"
-	"errors"
 	"postly/configs"
 	"postly/models"
 
@@ -23,11 +21,7 @@ func (ur UserRepository) CheckUser(username string) (bool, error) {
 		username,
 	).Scan(&exists)
 
-	if err != nil {
-		return false, err
-	}
-
-	return exists, nil
+	return exists, err
 }
 
 func (ur UserRepository) CreateUser(register models.Register) error {
@@ -46,11 +40,5 @@ func (ur UserRepository) GetUser(username string) (models.User, error) {
 		&user.Password,
 		&user.Firstname,
 		&user.Lastname)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return models.User{}, errors.New("user not found")
-		}
-		return models.User{}, err
-	}
-	return user, nil
+	return user, err
 }

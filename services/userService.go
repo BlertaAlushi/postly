@@ -1,6 +1,7 @@
 package services
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
@@ -43,6 +44,9 @@ func (us UserService) Login(login models.Login) (int, models.AuthToken, error) {
 	authToken := models.AuthToken{}
 	user, err := userRepository.GetUser(login.Username)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return http.StatusNotFound, authToken, errors.New("user not found")
+		}
 		return http.StatusInternalServerError, authToken, err
 	}
 

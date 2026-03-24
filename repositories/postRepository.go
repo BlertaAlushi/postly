@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"database/sql"
-	"errors"
 	"postly/configs"
 	"postly/models"
 )
@@ -22,24 +20,21 @@ func (pr PostRepository) GetPost(postID int) (models.Post, error) {
 	var post models.Post
 	err := configs.DB.QueryRow("select * from posts where id = $1", postID).Scan(
 		&post.ID, &post.UserID, &post.Content, &post.CreatedAt)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return post, errors.New("post not found")
-		}
-		return post, err
-	}
-	return post, nil
+	return post, err
 }
 
-func (pr PostRepository) Update(post models.Post) error {
-	_, err := configs.DB.Exec("update posts set content = $1 where id = $2", post.Content, post.ID)
+func (pr PostRepository) Update(post models.Post) (bool, error) {
+	result, err := configs.DB.Exec("update posts set content = $1 where id = $2", post.Content, post.ID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return errors.New("post not found")
-		}
-		return err
+		return false, err
 	}
-	return nil
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+
+	return rows > 0, nil
 }
 
 func (pr PostRepository) Delete(postID int) error {

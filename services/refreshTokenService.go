@@ -2,6 +2,7 @@ package services
 
 import (
 	"crypto/rand"
+	"database/sql"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -33,6 +34,9 @@ func (rts RefreshTokenService) RefreshToken(postRefreshToken string) (int, model
 	tokenID, _ := strconv.Atoi(parts[0])
 	getRefreshToken, err := refreshTokenRepository.GetRefreshTokenById(tokenID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return http.StatusNotFound, authToken, errors.New("refresh token not found")
+		}
 		return http.StatusInternalServerError, authToken, err
 	}
 

@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"database/sql"
-	"errors"
 	"postly/configs"
 	"postly/models"
 )
@@ -26,13 +24,8 @@ func (r RefreshTokenRepository) GetRefreshTokenById(tokenID int) (models.Refresh
 		&refreshToken.TokenHash,
 		&refreshToken.UserID,
 		&refreshToken.ExpiresAt)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return models.RefreshToken{}, errors.New("refresh token not found")
-		}
-		return models.RefreshToken{}, err
-	}
-	return refreshToken, nil
+
+	return refreshToken, err
 }
 
 func (r RefreshTokenRepository) DeleteRefreshToken(tokenHash string) error {

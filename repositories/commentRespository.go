@@ -14,9 +14,8 @@ func NewCommentRepository() *CommentRepository {
 func (cr CommentRepository) GetComments(postId int) ([]models.Comment, error) {
 	return []models.Comment{}, nil
 }
-func (cr CommentRepository) GetComment(commentId int) (models.Comment, error) {
-	var comment models.Comment
-	err := configs.DB.QueryRow("select * from comments where id=$1", commentId).Scan(&comment.ID, &comment.UserID, &comment.PostID, &comment.Content, &comment.CreatedAt)
+func (cr CommentRepository) GetComment(comment models.Comment) (models.Comment, error) {
+	err := configs.DB.QueryRow("select * from comments where id=$1 and post_id =$2", comment.ID, comment.PostID).Scan(&comment.ID, &comment.UserID, &comment.PostID, &comment.Content, &comment.CreatedAt)
 	return comment, err
 }
 

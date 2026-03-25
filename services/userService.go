@@ -23,13 +23,24 @@ func NewUserService() *UserService {
 }
 
 func (us UserService) Register(register models.Register) (int, string, error) {
-	exist, err := userRepository.CheckUser(register.Username)
+	user, err := userRepository.GetUserByUsernameOrEmail(register.Username, register.Email)
 	if err != nil {
-		return http.StatusInternalServerError, "", errors.New("internal server error")
+		if errors.Is(err, sql.ErrNoRows) {
+
+		} else {
+			return http.StatusInternalServerError, "", errors.New("internal server error")
+		}
 	}
 
-	if exist {
-		return http.StatusConflict, "username already exists", nil
+	if user.Username == register.Username {
+		return http.StatusConflict, "", errors.New("username already exists")
+	}
+	if user.Email == register.Email {
+		return http.StatusConflict, "", errors.New("email already taken")
+	}
+
+	if user.Email == register.Email {
+		return http.StatusConflict, "", errors.New("email already taken")
 	}
 
 	err = userRepository.CreateUser(register)

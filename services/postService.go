@@ -40,18 +40,37 @@ func (ps PostService) GetPost(postID int) (int, models.Post, error) {
 }
 
 func (ps PostService) UpdatePost(post models.Post) (int, error) {
-	updated, err := postRepository.Update(post)
+	getPost, err := postRepository.GetPost(post.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return http.StatusNotFound, errors.New("post not found")
+		}
+		return http.StatusInternalServerError, errors.New("internal server error")
+	}
+	if getPost.UserID != post.UserID {
+		return http.StatusForbidden, errors.New("user not allowed to modify post")
+	}
+
+	_, err = postRepository.Update(post)
 	if err != nil {
 		return http.StatusInternalServerError, errors.New("internal server error")
 	}
-	if !updated {
-		return http.StatusNotFound, errors.New("post not found")
-	}
+
 	return http.StatusOK, nil
 }
 
-func (ps PostService) DeletePost(postID int) (int, error) {
-	err := postRepository.Delete(postID)
+func (ps PostService) DeletePost(post models.Post) (int, error) {
+	getPost, err := postRepository.GetPost(post.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return http.StatusNotFound, errors.New("post not found")
+		}
+		return http.StatusInternalServerError, errors.New("internal server error")
+	}
+	if getPost.UserID != post.UserID {
+		return http.StatusForbidden, errors.New("user not allowed to delete post")
+	}
+	err = postRepository.Delete(post.ID)
 	if err != nil {
 		return http.StatusInternalServerError, errors.New("internal server error")
 	}

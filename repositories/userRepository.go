@@ -13,15 +13,16 @@ func NewUserRepository() *UserRepository {
 	return &UserRepository{}
 }
 
-func (ur UserRepository) CheckUser(username string) (bool, error) {
-	var exists bool
-
-	err := configs.DB.QueryRow(
-		`SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)`,
-		username,
-	).Scan(&exists)
-
-	return exists, err
+func (ur UserRepository) GetUserByUsernameOrEmail(username string, email string) (models.User, error) {
+	var user models.User
+	err := configs.DB.QueryRow("Select id,username,email,password,firstname, lastname from users where username = $1 or email = $2", username, email).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.Password,
+		&user.Firstname,
+		&user.Lastname)
+	return user, err
 }
 
 func (ur UserRepository) CreateUser(register models.Register) error {

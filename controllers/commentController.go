@@ -25,10 +25,9 @@ func (cc CommentController) Comments(c *gin.Context) {
 
 func (cc CommentController) NewComment(c *gin.Context) {
 	var comment models.Comment
-	userID, _ := c.Get("user_id")
-	comment.UserID = userID.(int)
-	postID := c.Param("id")
-	comment.PostID, _ = strconv.Atoi(postID)
+	userID := c.GetInt("user_id")
+	comment.UserID = userID
+	comment.PostID, _ = strconv.Atoi(c.Param("id"))
 
 	if err := c.ShouldBindJSON(&comment); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -45,8 +44,10 @@ func (cc CommentController) NewComment(c *gin.Context) {
 }
 
 func (cc CommentController) GetComment(c *gin.Context) {
-	commentId, _ := strconv.Atoi(c.Param("comment_id"))
-	status, comment, err := commentService.GetComment(commentId)
+	var comment models.Comment
+	comment.ID, _ = strconv.Atoi(c.Param("comment_id"))
+	comment.PostID, _ = strconv.Atoi(c.Param("id"))
+	status, comment, err := commentService.GetComment(comment)
 	if err != nil {
 		c.JSON(status, gin.H{"error": err.Error()})
 		return
@@ -56,12 +57,10 @@ func (cc CommentController) GetComment(c *gin.Context) {
 
 func (cc CommentController) EditComment(c *gin.Context) {
 	var comment models.Comment
-	userID, _ := c.Get("user_id")
-	comment.UserID = userID.(int)
-	postID := c.Param("id")
-	comment.PostID, _ = strconv.Atoi(postID)
-	commentID := c.Param("comment_id")
-	comment.ID, _ = strconv.Atoi(commentID)
+	userID := c.GetInt("user_id")
+	comment.UserID = userID
+	comment.PostID, _ = strconv.Atoi(c.Param("id"))
+	comment.ID, _ = strconv.Atoi(c.Param("comment_id"))
 
 	if err := c.ShouldBindJSON(&comment); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -73,13 +72,17 @@ func (cc CommentController) EditComment(c *gin.Context) {
 		c.JSON(status, gin.H{"error": err.Error()})
 		return
 	}
-
 	c.JSON(status, gin.H{"message": "Comment Updated"})
 }
 
 func (cc CommentController) DeleteComment(c *gin.Context) {
-	commentId, _ := strconv.Atoi(c.Param("comment_id"))
-	status, err := commentService.DeleteComment(commentId)
+	var comment models.Comment
+	userID := c.GetInt("user_id")
+	comment.UserID = userID
+	comment.PostID, _ = strconv.Atoi(c.Param("id"))
+	comment.ID, _ = strconv.Atoi(c.Param("comment_id"))
+
+	status, err := commentService.DeleteComment(comment)
 	if err != nil {
 		c.JSON(status, gin.H{"error": err.Error()})
 		return

@@ -49,3 +49,31 @@ func (fc FollowController) Unfollow(c *gin.Context) {
 		"message": "Unfollowing User",
 	})
 }
+
+func (fc FollowController) Following(c *gin.Context) {
+	userId := c.GetInt("user_id")
+	status, following, err := followService.Following(userId)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(status, gin.H{
+		"following": following,
+	})
+}
+
+func (fc FollowController) Followers(c *gin.Context) {
+	userId := c.GetInt("user_id")
+	status, followers, err := followService.Followers(userId)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(status, gin.H{
+		"followers": followers,
+	})
+}

@@ -41,6 +41,8 @@ func ApiRoutes(r *gin.Engine) {
 		auth.PUT("/posts/:id/comments/:comment_id", comment.EditComment)
 		auth.DELETE("/posts/:id/comments/:comment_id", comment.DeleteComment)
 
+		auth.GET("/following", follow.Following)
+		auth.GET("/followers", follow.Followers)
 		auth.POST("/follow/:follow_id", follow.Follow)
 		auth.DELETE("/follow/:follow_id", follow.Unfollow)
 	}

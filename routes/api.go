@@ -13,6 +13,7 @@ func ApiRoutes(r *gin.Engine) {
 	refreshToken := controllers.NewRefreshTokenController()
 	like := controllers.NewLikeController()
 	comment := controllers.NewCommentController()
+	follow := controllers.NewFollowController()
 	api := r.Group("/api")
 	{
 		api.POST("/register", user.Register)
@@ -39,5 +40,8 @@ func ApiRoutes(r *gin.Engine) {
 		auth.GET("/posts/:id/comments/:comment_id", comment.GetComment)
 		auth.PUT("/posts/:id/comments/:comment_id", comment.EditComment)
 		auth.DELETE("/posts/:id/comments/:comment_id", comment.DeleteComment)
+
+		auth.POST("/follow/:follow_id", follow.Follow)
+		auth.DELETE("/follow/:follow_id", follow.Unfollow)
 	}
 }

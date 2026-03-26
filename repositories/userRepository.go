@@ -43,3 +43,15 @@ func (ur UserRepository) GetUser(username string) (models.User, error) {
 		&user.Lastname)
 	return user, err
 }
+
+func (ur UserRepository) GetUserByID(id int) (models.User, error) {
+	var user models.User
+	err := configs.DB.QueryRow("Select id,username,email,password,firstname, lastname from users where id = $1", id).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.Password,
+		&user.Firstname,
+		&user.Lastname)
+	return user, err
+}

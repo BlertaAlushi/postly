@@ -40,3 +40,21 @@ func (ls LikeService) RemoveLike(like models.Like) (int, error) {
 	}
 	return http.StatusOK, nil
 }
+
+func (ls LikeService) GetLikes(postID int) (int, []models.UserResponse, error) {
+	_, err := postRepository.GetPost(postID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return http.StatusNotFound, nil, errors.New("post not found")
+		}
+		return http.StatusInternalServerError, nil, err
+	}
+
+	likes, err := likeRepository.GetPostLikes(postID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+		}
+		return http.StatusInternalServerError, nil, err
+	}
+	return http.StatusOK, likes, nil
+}

@@ -50,8 +50,8 @@ func (fc FollowController) Unfollow(c *gin.Context) {
 	})
 }
 
-func (fc FollowController) Following(c *gin.Context) {
-	userId := c.GetInt("user_id")
+func (fc FollowController) UserFollowing(c *gin.Context) {
+	userId,_:= strconv.Atoi(c.Param("id"))
 	status, following, err := followService.Following(userId)
 	if err != nil {
 		c.JSON(status, gin.H{
@@ -64,8 +64,8 @@ func (fc FollowController) Following(c *gin.Context) {
 	})
 }
 
-func (fc FollowController) Followers(c *gin.Context) {
-	userId := c.GetInt("user_id")
+func (fc FollowController) UserFollowers(c *gin.Context) {
+	userId,_:= strconv.Atoi(c.Param("id"))
 	status, followers, err := followService.Followers(userId)
 	if err != nil {
 		c.JSON(status, gin.H{

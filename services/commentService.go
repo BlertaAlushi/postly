@@ -79,3 +79,21 @@ func (cs CommentService) UpdateComment(comment models.Comment) (int, error) {
 	}
 	return http.StatusOK, nil
 }
+
+func (cs CommentService) GetComments(postID int) (int, []models.UserComment, error) {
+	_, err := postRepository.GetPost(postID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return http.StatusNotFound, nil, errors.New("post not found")
+		}
+		return http.StatusInternalServerError, nil, errors.New("internal server error")
+	}
+
+	comments, err := commentRepository.GetPostComments(postID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+		}
+		return http.StatusInternalServerError, nil, errors.New("internal server error")
+	}
+	return http.StatusOK, comments, nil
+}

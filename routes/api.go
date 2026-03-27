@@ -25,13 +25,16 @@ func ApiRoutes(r *gin.Engine) {
 	auth := r.Group("/api")
 	auth.Use(middlewares.AuthMiddleware())
 	{
-		auth.GET("/posts", post.GetPosts)
+		auth.GET("users/:id/posts", post.GetUserPosts)
+		auth.GET("/feed", post.GetFollowingPosts)
+		auth.GET("/expolore", post.GetExplorePosts)
+
 		auth.POST("/posts", post.CreatePost)
 		auth.GET("/posts/:id", post.GetPost)
 		auth.PUT("/posts/:id", post.UpdatePost)
 		auth.DELETE("/posts/:id", post.DeletePost)
 
-		auth.GET("/post/:id/likes", like.Likes)
+		auth.GET("/posts/:id/likes", like.Likes)
 		auth.POST("/posts/:id/like", like.NewLike)
 		auth.DELETE("/posts/:id/like", like.RemoveLike)
 
@@ -41,8 +44,9 @@ func ApiRoutes(r *gin.Engine) {
 		auth.PUT("/posts/:id/comments/:comment_id", comment.EditComment)
 		auth.DELETE("/posts/:id/comments/:comment_id", comment.DeleteComment)
 
-		auth.GET("/following", follow.Following)
-		auth.GET("/followers", follow.Followers)
+		auth.GET("users/:id/following", follow.UserFollowing)
+		auth.GET("users/:id/followers", follow.UserFollowers)
+
 		auth.POST("/follow/:follow_id", follow.Follow)
 		auth.DELETE("/follow/:follow_id", follow.Unfollow)
 	}

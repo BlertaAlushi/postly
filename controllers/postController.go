@@ -17,8 +17,8 @@ func NewPostController() *PostController {
 	return &PostController{}
 }
 
-func (p PostController) GetPosts(c *gin.Context) {
-	userID := c.GetInt("user_id")
+func (p PostController) GetUserPosts(c *gin.Context) {
+	userID,_:= strconv.Atoi(c.Param("id"))
 	status, posts, err := postService.GetPosts(userID)
 	if err != nil {
 		c.JSON(status, gin.H{
@@ -31,6 +31,14 @@ func (p PostController) GetPosts(c *gin.Context) {
 		"posts": posts,
 	})
 }
+
+func (p PostController) GetFollowingPosts(c *gin.Context) {
+
+}
+func (p PostController) GetExplorePosts(c *gin.Context) {
+
+}
+
 func (p PostController) CreatePost(c *gin.Context) {
 	var post models.Post
 	if err := c.ShouldBindJSON(&post); err != nil {

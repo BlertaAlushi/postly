@@ -18,9 +18,18 @@ func NewCommentController() *CommentController {
 }
 
 func (cc CommentController) Comments(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "ok",
+	postID, _ := strconv.Atoi(c.Param("id"))
+	status, comments, err := commentService.GetComments(postID)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(status, gin.H{
+		"comments": comments,
 	})
+
 }
 
 func (cc CommentController) NewComment(c *gin.Context) {

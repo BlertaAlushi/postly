@@ -42,6 +42,12 @@ func (fs *FollowService) Unfollow(follow models.Follow) (int, error) {
 }
 
 func (fs *FollowService) Following(userID int) (int, []models.UserResponse, error) {
+	_, err := userRepository.GetUserByID(userID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return http.StatusNotFound, nil, errors.New("user not found")
+		}
+	}
 	followingUsers, err := followRepository.GetFollowing(userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -52,6 +58,12 @@ func (fs *FollowService) Following(userID int) (int, []models.UserResponse, erro
 }
 
 func (fs *FollowService) Followers(userID int) (int, []models.UserResponse, error) {
+	_, err := userRepository.GetUserByID(userID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return http.StatusNotFound, nil, errors.New("user not found")
+		}
+	}
 	followers, err := followRepository.GetFollowers(userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

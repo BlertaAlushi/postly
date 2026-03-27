@@ -9,3 +9,8 @@ type Comment struct {
 	Content   string    `json:"content" binding:"required"`
 	CreatedAt time.Time `json:"created_at"`
 }
+
+type UserComment struct {
+	UserResponse
+	Comment string `json:"comment"`
+}

@@ -37,3 +37,37 @@ func (cr CommentRepository) Delete(commentId int) error {
 	_, err := configs.DB.Exec("delete from comments where id = $1", commentId)
 	return err
 }
+
+func (cr CommentRepository) GetPostComments(postID int) ([]models.UserComment, error) {
+	var comments []models.UserComment
+	rows, err := configs.DB.Query(`
+		select u.id, u.username, u.firstname, u.lastname, c.content
+		from comments as c
+		join posts as p on c.post_id = p.id
+		join users as u on c.user_id = u.id
+		where c.post_id = $1
+		order by c.id desc
+	`, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var comment models.UserComment
+		if err = rows.Scan(
+			&comment.ID,
+			&comment.Username,
+			&comment.Firstname,
+			&comment.Lastname,
+			&comment.Comment,
+		); err != nil {
+			return nil, err
+		}
+		comments = append(comments, comment)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return comments, nil
+}

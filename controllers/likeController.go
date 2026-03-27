@@ -17,6 +17,17 @@ func NewLikeController() *LikeController {
 }
 
 func (lc LikeController) Likes(c *gin.Context) {
+	postID, _ := strconv.Atoi(c.Param("id"))
+	status, likes, err := likeService.GetLikes(postID)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(status, gin.H{
+		"likes": likes,
+	})
 
 }
 

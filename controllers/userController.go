@@ -54,8 +54,8 @@ func (u UserController) Logout(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	status, err := userService.Logout(refreshToken.RefreshToken)
+	userID := c.GetInt("user_id")
+	status, err := userService.Logout(userID, refreshToken.RefreshToken)
 	if err != nil {
 		c.JSON(status, gin.H{"error": err.Error()})
 		return

@@ -31,22 +31,32 @@ func (rts RefreshTokenService) NewRefreshToken(userID int) (int, string, error) 
 func (rts RefreshTokenService) RefreshToken(postRefreshToken string) (int, models.AuthToken, error) {
 	var authToken = models.AuthToken{}
 	parts := strings.Split(postRefreshToken, ".")
-	tokenID, _ := strconv.Atoi(parts[0])
+	if len(parts) != 2 {
+		return http.StatusUnauthorized, authToken, errors.New("invalid refresh token")
+	}
+	tokenID, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return http.StatusUnauthorized, authToken, errors.New("invalid refresh token")
+	}
 	getRefreshToken, err := refreshTokenRepository.GetRefreshTokenById(tokenID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return http.StatusNotFound, authToken, errors.New("refresh token not found")
+			return http.StatusUnauthorized, authToken, errors.New("invalid refresh token")
 		}
 		return http.StatusInternalServerError, authToken, errors.New("internal server error")
 	}
 
+	if getRefreshToken.ExpiresAt.Before(time.Now()) {
+		return http.StatusUnauthorized, authToken, errors.New("invalid refresh token")
+	}
+
 	err = bcrypt.CompareHashAndPassword([]byte(getRefreshToken.TokenHash), []byte(parts[1]))
 	if err != nil {
-		return http.StatusNotFound, authToken, errors.New("wrong refresh token")
+		return http.StatusUnauthorized, authToken, errors.New("invalid refresh token")
 	}
 
 	userID := getRefreshToken.UserID
-	err = refreshTokenRepository.DeleteRefreshToken(getRefreshToken.TokenHash)
+	err = refreshTokenRepository.DeleteRefreshTokenById(getRefreshToken.ID)
 	if err != nil {
 		return http.StatusInternalServerError, authToken, errors.New("internal server error")
 	}

@@ -8,6 +8,7 @@ type AuthToken struct {
 }
 
 type RefreshToken struct {
+	ID        int
 	TokenHash string
 	UserID    int
 	ExpiresAt time.Time

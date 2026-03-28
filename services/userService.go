@@ -9,6 +9,7 @@ import (
 	"postly/repositories"
 	"strconv"
 	"strings"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -82,22 +83,36 @@ func (us UserService) Login(login models.Login) (int, models.AuthToken, error) {
 	return http.StatusOK, authToken, nil
 }
 
-func (us UserService) Logout(refreshToken string) (int, error) {
+func (us UserService) Logout(userID int, refreshToken string) (int, error) {
 	parts := strings.Split(refreshToken, ".")
-	tokenId, _ := strconv.Atoi(parts[0])
+	if len(parts) != 2 {
+		return http.StatusUnauthorized, errors.New("invalid refresh token")
+	}
+	tokenId, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return http.StatusUnauthorized, errors.New("invalid refresh token")
+	}
 	getRefreshToken, err := refreshTokenRepository.GetRefreshTokenById(tokenId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return http.StatusUnauthorized, errors.New("refresh token not found")
+			return http.StatusUnauthorized, errors.New("invalid refresh token")
 		}
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, errors.New("internal server error")
+	}
+
+	if getRefreshToken.ExpiresAt.Before(time.Now()) {
+		return http.StatusUnauthorized, errors.New("invalid refresh token")
+	}
+
+	if userID != getRefreshToken.UserID {
+		return http.StatusForbidden, errors.New("refresh token does not belong to user")
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(getRefreshToken.TokenHash), []byte(parts[1])); err != nil {
-		return http.StatusUnauthorized, errors.New("wrong refresh token")
+		return http.StatusUnauthorized, errors.New("invalid refresh token")
 	}
 
-	err = refreshTokenRepository.DeleteRefreshToken(getRefreshToken.TokenHash)
+	err = refreshTokenRepository.DeleteRefreshTokenById(getRefreshToken.ID)
 	if err != nil {
 		return http.StatusInternalServerError, errors.New("internal server error")
 	}

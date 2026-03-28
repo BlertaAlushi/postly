@@ -18,13 +18,14 @@ func ApiRoutes(r *gin.Engine) {
 	{
 		api.POST("/register", user.Register)
 		api.POST("/login", user.Login)
-		api.POST("/logout", user.Logout)
 		api.POST("/token/refresh", refreshToken.RefreshToken)
 	}
 
 	auth := r.Group("/api")
 	auth.Use(middlewares.AuthMiddleware())
 	{
+		auth.POST("/logout", user.Logout)
+
 		auth.GET("users/:id/posts", post.GetUserPosts)
 		auth.GET("/feed", post.GetFollowingPosts)
 		auth.GET("/expolore", post.GetExplorePosts)

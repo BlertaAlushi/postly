@@ -16,8 +16,45 @@ func NewPostService() *PostService {
 	return &PostService{}
 }
 
-func (ps PostService) GetPosts(userID int) (int, []models.Post, error) {
-	return http.StatusOK, nil, nil
+func (ps PostService) GetUserPosts(userID int) (int, []models.PostResponse, error) {
+	_, err := userRepository.GetUserByID(userID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return http.StatusNotFound, []models.PostResponse{}, errors.New("user not found")
+		}
+		return http.StatusInternalServerError, nil, errors.New(http.StatusText(http.StatusInternalServerError))
+	}
+
+	posts, err := postRepository.GetPosts(userID, "user")
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+		}
+		return http.StatusInternalServerError, nil, errors.New(http.StatusText(http.StatusInternalServerError))
+	}
+
+	return http.StatusOK, posts, nil
+}
+
+func (ps PostService) Feed(userID int) (int, []models.PostResponse, error) {
+	posts, err := postRepository.GetPosts(userID, "feed")
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+		}
+		return http.StatusInternalServerError, nil, errors.New(http.StatusText(http.StatusInternalServerError))
+	}
+
+	return http.StatusOK, posts, nil
+}
+
+func (ps PostService) Explore(userID int) (int, []models.PostResponse, error) {
+	posts, err := postRepository.GetPosts(userID, "explore")
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+		}
+		return http.StatusInternalServerError, nil, err
+	}
+
+	return http.StatusOK, posts, nil
 }
 
 func (ps PostService) CreatePost(newPost models.Post) (int, error) {

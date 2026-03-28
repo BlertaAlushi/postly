@@ -14,6 +14,7 @@ func ApiRoutes(r *gin.Engine) {
 	like := controllers.NewLikeController()
 	comment := controllers.NewCommentController()
 	follow := controllers.NewFollowController()
+
 	api := r.Group("/api")
 	{
 		api.POST("/register", user.Register)
@@ -27,8 +28,8 @@ func ApiRoutes(r *gin.Engine) {
 		auth.POST("/logout", user.Logout)
 
 		auth.GET("users/:id/posts", post.GetUserPosts)
-		auth.GET("/feed", post.GetFollowingPosts)
-		auth.GET("/expolore", post.GetExplorePosts)
+		auth.GET("/feed", post.GetFeedPosts)
+		auth.GET("/explore", post.GetExplorePosts)
 
 		auth.POST("/posts", post.CreatePost)
 		auth.GET("/posts/:id", post.GetPost)

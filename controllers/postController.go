@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"postly/models"
 	"postly/services"
@@ -18,8 +19,12 @@ func NewPostController() *PostController {
 }
 
 func (p PostController) GetUserPosts(c *gin.Context) {
-	userID,_:= strconv.Atoi(c.Param("id"))
-	status, posts, err := postService.GetPosts(userID)
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		return
+	}
+	status, posts, err := postService.GetUserPosts(userID)
 	if err != nil {
 		c.JSON(status, gin.H{
 			"error": err.Error(),
@@ -32,11 +37,35 @@ func (p PostController) GetUserPosts(c *gin.Context) {
 	})
 }
 
-func (p PostController) GetFollowingPosts(c *gin.Context) {
+func (p PostController) GetFeedPosts(c *gin.Context) {
+	userID := c.GetInt("user_id")
+	fmt.Println(userID)
+	status, posts, err := postService.Feed(userID)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 
+	c.JSON(status, gin.H{
+		"posts": posts,
+	})
 }
 func (p PostController) GetExplorePosts(c *gin.Context) {
+	userID := c.GetInt("user_id")
+	fmt.Println(userID)
+	status, posts, err := postService.Explore(userID)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 
+	c.JSON(status, gin.H{
+		"posts": posts,
+	})
 }
 
 func (p PostController) CreatePost(c *gin.Context) {

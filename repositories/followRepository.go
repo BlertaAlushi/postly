@@ -31,7 +31,7 @@ func (fr *FollowRepository) GetFollowing(userID int) ([]models.UserResponse, err
 	var follows []models.UserResponse
 	rows, err := configs.DB.Query(`
 		select u.id, u.username, u.firstname, u.lastname
-		from follows AS f
+		from follows as f
 		join users as u on u.id = f.follow_id
 		where f.user_id = $1
 		order by f.id desc
@@ -63,7 +63,7 @@ func (fr *FollowRepository) GetFollowers(userID int) ([]models.UserResponse, err
 	var followers []models.UserResponse
 	rows, err := configs.DB.Query(`
 		select u.id, u.username, u.firstname, u.lastname
-		from follows AS f
+		from follows as f
 		join users as u on u.id = f.user_id
 		where f.follow_id = $1
 		order by f.id desc

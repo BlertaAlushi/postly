@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"postly/models"
 	"postly/services"
@@ -39,7 +38,6 @@ func (p PostController) GetUserPosts(c *gin.Context) {
 
 func (p PostController) GetFeedPosts(c *gin.Context) {
 	userID := c.GetInt("user_id")
-	fmt.Println(userID)
 	status, posts, err := postService.Feed(userID)
 	if err != nil {
 		c.JSON(status, gin.H{
@@ -54,7 +52,6 @@ func (p PostController) GetFeedPosts(c *gin.Context) {
 }
 func (p PostController) GetExplorePosts(c *gin.Context) {
 	userID := c.GetInt("user_id")
-	fmt.Println(userID)
 	status, posts, err := postService.Explore(userID)
 	if err != nil {
 		c.JSON(status, gin.H{

@@ -26,8 +26,9 @@ func ApiRoutes(r *gin.Engine) {
 	auth.Use(middlewares.AuthMiddleware())
 	{
 		auth.POST("/logout", user.Logout)
+		auth.GET("/users", user.Users)
 
-		auth.GET("users/:id/posts", post.GetUserPosts)
+		auth.GET("/users/:id/posts", post.GetUserPosts)
 		auth.GET("/feed", post.GetFeedPosts)
 		auth.GET("/explore", post.GetExplorePosts)
 

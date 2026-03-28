@@ -47,7 +47,7 @@ func (u UserController) Login(c *gin.Context) {
 
 func (u UserController) Logout(c *gin.Context) {
 	refreshToken := struct {
-		RefreshToken string `json:"refresh_token"`
+		RefreshToken string `json:"refresh_token" binding:"required"`
 	}{}
 	err := c.ShouldBindJSON(&refreshToken)
 	if err != nil {
@@ -62,4 +62,21 @@ func (u UserController) Logout(c *gin.Context) {
 	}
 
 	c.JSON(status, gin.H{"message": "User successfully logged out."})
+}
+
+func (u UserController) Users(c *gin.Context) {
+	search := struct {
+		Search string `json:"search" binding:"required"`
+	}{}
+	if err := c.ShouldBindJSON(&search); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	status, users, err := userService.GetUsers(search.Search)
+	if err != nil {
+		c.JSON(status, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(status, gin.H{"users": users})
 }

@@ -118,3 +118,13 @@ func (us UserService) Logout(userID int, refreshToken string) (int, error) {
 	}
 	return http.StatusOK, nil
 }
+
+func (us UserService) GetUsers(search string) (int, []models.UserResponse, error) {
+	users, err := userRepository.SearchUsers(search)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+		}
+		return http.StatusInternalServerError, nil, err
+	}
+	return http.StatusOK, users, nil
+}

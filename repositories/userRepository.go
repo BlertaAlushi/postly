@@ -55,3 +55,34 @@ func (ur UserRepository) GetUserByID(id int) (models.User, error) {
 		&user.Lastname)
 	return user, err
 }
+
+func (ur UserRepository) SearchUsers(search string) ([]models.UserResponse, error) {
+	rows, err := configs.DB.Query(`
+			select id,username,firstname,lastname
+			from users
+		  	where username ilike '%' || $1 || '%'
+           	or firstname ilike '%' || $1 || '%'
+           	or lastname ilike '%' || $1 || '%'
+			order by id desc
+	`, search)
+	if err != nil {
+		return nil, err
+	}
+	var users []models.UserResponse
+	for rows.Next() {
+		var user models.UserResponse
+		err = rows.Scan(
+			&user.ID,
+			&user.Username,
+			&user.Firstname,
+			&user.Lastname)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return users, nil
+}

@@ -17,7 +17,7 @@ func NewRefreshTokenController() *RefreshTokenController {
 
 func (rtc RefreshTokenController) RefreshToken(c *gin.Context) {
 	refreshToken := struct {
-		RefreshToken string `json:"refresh_token"`
+		RefreshToken string `json:"refresh_token" binding:"required"`
 	}{}
 	err := c.ShouldBindJSON(&refreshToken)
 	if err != nil {

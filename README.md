@@ -95,7 +95,7 @@ go run main.go
 
 ---
 
-## API Routes
+## 📡 API Overview
 
 ### Public
 

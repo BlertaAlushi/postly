@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"net/http"
+	"postly/interfaces"
 	"postly/models"
 	"postly/services"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,6 +25,8 @@ func (u UserController) Register(c *gin.Context) {
 		return
 	}
 
+	interfaces.NormalizeInput(&user)
+
 	status, message, err := userService.Register(user)
 	if err != nil {
 		c.JSON(status, gin.H{"error": err.Error()})
@@ -37,6 +41,9 @@ func (u UserController) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	interfaces.NormalizeInput(&login)
+
 	status, token, err := userService.Login(login)
 	if err != nil {
 		c.JSON(status, gin.H{"error": err.Error()})
@@ -73,7 +80,7 @@ func (u UserController) Users(c *gin.Context) {
 		return
 	}
 
-	status, users, err := userService.GetUsers(search.Search)
+	status, users, err := userService.GetUsers(strings.TrimSpace(search.Search))
 	if err != nil {
 		c.JSON(status, gin.H{"error": err.Error()})
 		return

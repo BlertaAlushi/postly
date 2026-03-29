@@ -26,7 +26,7 @@ func ApiRoutes(r *gin.Engine) {
 	auth.Use(middlewares.AuthMiddleware())
 	{
 		auth.POST("/logout", user.Logout)
-		auth.GET("/users", user.Users)
+		auth.POST("/users", user.Users)
 
 		auth.GET("/users/:id/posts", post.GetUserPosts)
 		auth.GET("/feed", post.GetFeedPosts)
@@ -47,8 +47,8 @@ func ApiRoutes(r *gin.Engine) {
 		auth.PUT("/posts/:id/comments/:comment_id", comment.EditComment)
 		auth.DELETE("/posts/:id/comments/:comment_id", comment.DeleteComment)
 
-		auth.GET("users/:id/following", follow.UserFollowing)
-		auth.GET("users/:id/followers", follow.UserFollowers)
+		auth.GET("/users/:id/following", follow.UserFollowing)
+		auth.GET("/users/:id/followers", follow.UserFollowers)
 
 		auth.POST("/follow/:follow_id", follow.Follow)
 		auth.DELETE("/follow/:follow_id", follow.Unfollow)
